@@ -2,6 +2,6 @@
   roles:
     - role: gantsign.visual-studio-code
       users:
-        - username: johannes
+        - username: "{{ ansible_user_id }}"
           visual_studio_code_extensions:
             - tfehlmann.snakefmt
