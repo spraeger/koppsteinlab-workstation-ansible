@@ -1,4 +1,9 @@
 - hosts: 127.0.0.1
+  tasks:
+    - name:
+      community.general.ansible_galaxy_install:
+        type: role
+        name: gantsign.visual-studio-code
   roles:
     - role: gantsign.visual-studio-code
       users:
