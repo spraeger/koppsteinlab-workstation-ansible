@@ -1,18 +1,7 @@
 - hosts: 127.0.0.1
-  tasks:
-    # taken from https://github.com/gantsign/ansible-role-visual-studio-code
-    - name: Install VS Code repo
-      become: yes
-      ansible.builtin.yum_repository:
-        name: code
-        description: Visual Studio Code repo
-        file: vscode
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        gpgcheck: yes
-    
-    - name: Install VS Code
-      become: yes
-      package:
-        name: code
-        state: present
+  roles:
+    - role: gantsign.visual-studio-code
+      users:
+        username: {{ ansible_user_id }}
+        visual_studio_code_extensions:
+          - tfehlmann.snakefmt
