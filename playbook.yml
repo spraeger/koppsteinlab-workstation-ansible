@@ -1,12 +1,13 @@
 - hosts: 127.0.0.1
   tasks:
-    - name:
+    - name: Deploy vscode role
       community.general.ansible_galaxy_install:
         type: role
         name: gantsign.visual-studio-code
-  roles:
-    - role: gantsign.visual-studio-code
-      users:
-        - username: "{{ ansible_user_id }}"
-          visual_studio_code_extensions:
-            - tfehlmann.snakefmt
+    - name: Setup vscode
+      include_role: 
+        name: gantsign.visual-studio-code
+        users:
+          - username: "{{ ansible_user_id }}"
+            visual_studio_code_extensions:
+              - tfehlmann.snakefmt
