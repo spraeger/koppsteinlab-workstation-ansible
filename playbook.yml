@@ -1,4 +1,4 @@
-- hosts: fedora
+- hosts: localhost
   tasks:
     - name: Remove Shotwell
       become: yes
