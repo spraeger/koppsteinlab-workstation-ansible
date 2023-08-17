@@ -1,13 +1,28 @@
 - hosts: 127.0.0.1
   tasks:
+
+    # Deploy roles from ansible galaxy (always pin a version)
     - name: Deploy vscode role
       community.general.ansible_galaxy_install:
         type: role
-        name: gantsign.visual-studio-code
+        name: gantsign.visual-studio-code:6.11.0
+
+    - name: Deploy rustup role
+      community.general.ansible_galaxy_install:
+        type: role
+        name: naftulikay.rust-dev:3.2.0
+
+    # Run tasks and roles
     - name: Setup vscode
       include_role: 
         name: gantsign.visual-studio-code
-        users:
+      vars:
+	      users:
           - username: "{{ ansible_user_id }}"
             visual_studio_code_extensions:
               - tfehlmann.snakefmt
+    - name: Setup rust
+      include_role:
+        name: naftulikay.rust-dev
+      vars:
+        rust_user: "{{ ansible_user_id }}"
