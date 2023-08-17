@@ -1,11 +1,5 @@
 - hosts: 127.0.0.1
   tasks:
-    - name: Remove Shotwell
-      become: yes
-      package:
-        name: shotwell
-        state: absent
-
     # taken from https://github.com/gantsign/ansible-role-visual-studio-code
     - name: Install VS Code repo
       become: yes
