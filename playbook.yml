@@ -1,4 +1,10 @@
 - hosts: 127.0.0.1
+
+  vars_prompt:
+    - name: ikim_username
+      prompt: What is your IKIM username?
+      private: false
+
   tasks:
     # taken from https://github.com/gantsign/ansible-role-visual-studio-code
     - name: Install VS Code repo
@@ -72,13 +78,13 @@
 
           Host ikim
             HostName login.ikim.uk-essen.de
-            User $USERNAME
+            User {{ ikim_username }}}
             IdentityFile ~/.ssh/id_ikim
             ForwardAgent yes
 
           Host g1-? c? c?? shellhost
             Hostname %h.ikim.uk-essen.de
-            User $USERNAME
+            User {{ ikim_username }}}
             IdentityFile ~/.ssh/id_ikim
             ProxyJump ikim
             ForwardAgent yes
