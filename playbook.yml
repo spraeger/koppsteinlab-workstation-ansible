@@ -1,28 +1,82 @@
 - hosts: 127.0.0.1
   tasks:
+    # taken from https://github.com/gantsign/ansible-role-visual-studio-code
+    - name: Install VS Code repo
+      become: yes
+      ansible.builtin.yum_repository:
+        name: code
+        description: Visual Studio Code repo
+        file: vscode
+        baseurl: https://packages.microsoft.com/yumrepos/vscode
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        gpgcheck: yes
 
-    # Deploy roles from ansible galaxy (always pin a version)
-    - name: Deploy vscode role
-      community.general.ansible_galaxy_install:
-        type: role
-        name: gantsign.visual-studio-code:6.11.0
+    - name: Enable Fedora Coprs
+      become: yes
+      community.general.copr:
+        name: "{{ item }}"
+      loop:
+        - atim/nushell
 
-    - name: Deploy rustup role
-      community.general.ansible_galaxy_install:
-        type: role
-        name: naftulikay.rust-dev:3.2.0
 
-    # Run tasks and roles
-    - name: Setup vscode
-      include_role: 
-        name: gantsign.visual-studio-code
-      vars:
-        users:
-          - username: "{{ ansible_user_id }}"
-            visual_studio_code_extensions:
-              - tfehlmann.snakefmt
-    - name: Setup rust
-      include_role:
-        name: naftulikay.rust-dev
-      vars:
-        rust_user: "{{ ansible_user_id }}"
+    - name: Install packages
+      become: yes
+      package:
+        name:
+          - code
+          - rust
+          - cargo
+          - git
+          - cmake
+          - nushell
+          - util-linux-user
+          - "@Development Tools"
+
+    - name: Install vcode extensions
+      command: "code --install-extension {{ item }}"
+      loop:
+        - tfehlmann.snakefmt
+        - Snakemake.snakemake-lang
+        - ms-vscode-remote.remote-ssh
+        - rust-lang.rust-analyzer
+        - mechatroner.rainbow-csv
+        - GitHub.copilot
+        - GitHub.vscode-pull-request-github
+        - GitHub.remotehub
+
+    - name: Setup SSH
+      copy:
+        dest: ~/.ssh/config
+        content: |
+          Host *
+            AddKeysToAgent yes
+            CanonicalizeHostname yes
+
+          Host ikim
+            HostName login.ikim.uk-essen.de
+            User $USERNAME
+            IdentityFile ~/.ssh/id_ikim
+            ForwardAgent yes
+
+          Host g1-? c? c?? shellhost
+            Hostname %h.ikim.uk-essen.de
+            User $USERNAME
+            IdentityFile ~/.ssh/id_ikim
+            ProxyJump ikim
+            ForwardAgent yes
+
+    - name: Setup shell functions and aliases
+      copy:
+        dest: ~/.profile
+        content: |
+          alias ikim-proxy="ssh -fND 7001 ikim"
+
+    - name: Register nushell
+      become: yes
+      lineinfile:
+        dest: /etc/shells
+        line: /usr/bin/nu
+
+    - name: Setup nushell as default
+      become: yes
+      command: "chsh -s /usr/bin/nu {{ ansible_user_id }}"
