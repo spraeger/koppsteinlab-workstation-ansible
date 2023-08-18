@@ -3,7 +3,7 @@
     # taken from https://github.com/gantsign/ansible-role-visual-studio-code
     - name: Install VS Code repo
       become: yes
-      ansible.builtin.yum_repository:
+      yum_repository:
         name: code
         description: Visual Studio Code repo
         file: vscode
@@ -17,7 +17,24 @@
         name: "{{ item }}"
       loop:
         - atim/nushell
+    
+    - name: Importing RPM Fusion keys
+      become: yes
+      rpm_key:
+        state: present
+        key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-{{ item }}-fedora-2020"
+      loop:
+        - free
+        - nonfree
 
+    - name: Enable the RPM Fusion repository
+      become: yes
+      package:
+        name:
+          - "https://mirrors.rpmfusion.org/{{ item }}/fedora/rpmfusion-{{ item }}-release-{{ ansible_distribution_major_version }}.noarch.rpm"
+      loop:
+        - free
+        - nonfree
 
     - name: Install packages
       become: yes
@@ -30,6 +47,7 @@
           - cmake
           - nushell
           - util-linux-user
+          - discord
           - "@Development Tools"
 
     - name: Install vcode extensions
