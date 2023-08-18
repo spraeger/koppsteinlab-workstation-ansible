@@ -60,7 +60,7 @@
           - google-noto-emoji-fonts
           - "@Development Tools"
 
-    - name: Install vcode extensions
+    - name: Install vcsode extensions
       command: "code --install-extension {{ item }}"
       loop:
         - tfehlmann.snakefmt
@@ -71,6 +71,24 @@
         - GitHub.copilot
         - GitHub.vscode-pull-request-github
         - GitHub.remotehub
+    
+    - name: Create vscode settings dir
+      file:
+        path: ~/.config/Code/User
+        state: directory
+        mode: "u=rwx,go="
+    
+    - name:
+      copy:
+        dest: ~/.config/Code/User/settings.json
+        force: false
+        content: "{}"
+
+    - name: Configure vscode
+      shell: |
+        tmp=$(mktemp)
+        jq '."window.titlebarstyle" = "custom"' ~/.config/Code/User/settings.json > "$tmp"
+        mv "$tmp" ~/.config/Code/User/settings.json
 
     - name: Setup SSH
       copy:
