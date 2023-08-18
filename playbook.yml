@@ -22,6 +22,7 @@
       community.general.copr:
         name: "{{ item }}"
       loop:
+        - atim/starship
         - atim/nushell
     
     - name: Importing RPM Fusion keys
@@ -54,6 +55,11 @@
           - nushell
           - util-linux-user
           - discord
+          - starship
+          - google-noto-sans-fonts
+          - google-noto-sans-mono-fonts
+          - google-noto-serif-fonts
+          - google-noto-emoji-fonts
           - "@Development Tools"
 
     - name: Install vcode extensions
@@ -95,12 +101,17 @@
         content: |
           alias ikim-proxy="ssh -fND 7001 ikim"
 
+    - name: Setup starship
+      lineinfile:
+        dest: ~/.bashrc
+        line: 'eval "$(starship init bash)"'
+
     - name: Register nushell
       become: yes
       lineinfile:
         dest: /etc/shells
         line: /usr/bin/nu
 
-    - name: Setup nushell as default
-      become: yes
-      command: "chsh -s /usr/bin/nu {{ ansible_user_id }}"
+    # - name: Setup nushell as default
+    #   become: yes
+    #   command: "chsh -s /usr/bin/nu {{ ansible_user_id }}"
