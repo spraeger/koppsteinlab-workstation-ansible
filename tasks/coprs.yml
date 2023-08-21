@@ -1,0 +1,6 @@
+- name: Enable Fedora Coprs
+  become: yes
+  community.general.copr:
+    name: "{{ item }}"
+  loop:
+    - atim/starship

@@ -1,0 +1,16 @@
+- name: Install packages
+  become: yes
+  package:
+    name:
+      - starship
+
+- name: Setup shell functions and aliases
+  copy:
+    dest: ~/.profile
+    content: |
+      alias ikim-proxy="ssh -fND 7001 ikim"
+
+- name: Setup starship
+  lineinfile:
+    dest: ~/.bashrc
+    line: 'eval "$(starship init bash)"'

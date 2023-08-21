@@ -1,0 +1,15 @@
+# nerd fonts
+- name: Ensure fonts directory
+  file:
+    path: ~/.fonts
+    state: directory
+- name: Check if nerd font exists
+  stat:
+    path: ~/.fonts/UbuntuNerdFontMono-Regular.ttf
+  register: nerd_font
+- name: Download nerd font
+  when: not nerd_font.stat.exists
+  unarchive:
+    src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Ubuntu.zip
+    dest: ~/.fonts/
+    remote_src: yes

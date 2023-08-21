@@ -1,0 +1,9 @@
+- name: Install packages
+  become: yes
+  package:
+    name:
+      - rust
+      - cargo
+      - git
+      - cmake
+      - "@Development Tools"

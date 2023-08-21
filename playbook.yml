@@ -4,171 +4,24 @@
     - ~/.config/ansible/vars.yml
 
   tasks:
-    # https://github.com/FrameworkComputer/linux-docs/blob/main/Fedora38-13thGen.md
-    - name: Frame.work 13th gen workarounds
-      become: yes
-      shell: |
-        sudo grubby --update-kernel=ALL --args="module_blacklist=hid_sensor_hub"
-        sudo grubby --update-kernel=ALL --args="nvme.noacpi=1"
+    - include_tasks: tasks/coprs.yml
 
-    # taken from https://github.com/gantsign/ansible-role-visual-studio-code
-    - name: Install VS Code repo
-      become: yes
-      yum_repository:
-        name: code
-        description: Visual Studio Code repo
-        file: vscode
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        gpgcheck: yes
+    - include_tasks: tasks/framework.yml
 
-    - name: Enable Fedora Coprs
-      become: yes
-      community.general.copr:
-        name: "{{ item }}"
-      loop:
-        - atim/starship
-        - atim/nushell
+    - include_tasks: tasks/fonts.yml
 
-    - name: Importing RPM Fusion keys
-      become: yes
-      rpm_key:
-        state: present
-        key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-{{ item }}-fedora-2020"
-      loop:
-        - free
-        - nonfree
+    - include_tasks: tasks/dev.yml
 
-    - name: Enable the RPM Fusion repository
-      become: yes
-      package:
-        name:
-          - "https://mirrors.rpmfusion.org/{{ item }}/fedora/rpmfusion-{{ item }}-release-{{ ansible_distribution_major_version }}.noarch.rpm"
-      loop:
-        - free
-        - nonfree
+    - include_tasks: tasks/vscode.yml
 
-    - name: Install packages
-      become: yes
-      package:
-        name:
-          - code
-          - rust
-          - cargo
-          - git
-          - cmake
-          - nushell
-          - util-linux-user
-          - discord
-          - starship
-          - google-noto-sans-fonts
-          - google-noto-sans-mono-fonts
-          - google-noto-serif-fonts
-          - google-noto-emoji-fonts
-          - "@Development Tools"
-          - intel-media-driver
+    - include_tasks: tasks/multimedia.yml
 
-    - name: Rpmfusion multimedia
-      become: yes
-      shell: |
-        dnf swap ffmpeg-free ffmpeg --allowerasing -y
-        dnf groupupdate multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin -y
-        dnf groupupdate sound-and-video -y
+    - include_tasks: tasks/zoom.yml
 
-    # nerd fonts
-    - name: Ensure fonts directory
-      file:
-        path: ~/.fonts
-        state: directory
-    - name: Check if nerd font exists
-      stat:
-        path: ~/.fonts/UbuntuNerdFontMono-Regular.ttf
-      register: nerd_font
-    - name: Download nerd font
-      when: not nerd_font.stat.exists
-      unarchive:
-        src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Ubuntu.zip
-        dest: ~/.fonts/
-        remote_src: yes
+    - include_tasks: tasks/bash.yml
 
-    - name: Install vcsode extensions
-      command: "code --install-extension {{ item }}"
-      loop:
-        - tfehlmann.snakefmt
-        - Snakemake.snakemake-lang
-        - ms-vscode-remote.remote-ssh
-        - rust-lang.rust-analyzer
-        - mechatroner.rainbow-csv
-        - GitHub.copilot
-        - GitHub.vscode-pull-request-github
-        - GitHub.remotehub
-    
-    - name: Create vscode settings dir
-      file:
-        path: ~/.config/Code/User
-        state: directory
-        mode: "u=rwx,go="
-    
-    - name: Create vscode settings file
-      copy:
-        dest: ~/.config/Code/User/settings.json
-        force: false
-        content: "{}"
+    - include_tasks: tasks/git.yml
 
-    - name: Configure vscode
-      shell: |
-        tmp=$(mktemp)
-        jq '."window.titleBarStyle" = "custom"' ~/.config/Code/User/settings.json > "$tmp"
-        mv "$tmp" ~/.config/Code/User/settings.json
+    - include_tasks: tasks/ssh.yml
 
-    - name: Setup SSH
-      copy:
-        dest: ~/.ssh/config
-        content: |
-          Host *
-            AddKeysToAgent yes
-            CanonicalizeHostname yes
-
-          Host ikim
-            HostName login.ikim.uk-essen.de
-            User {{ ikim_username }}
-            IdentityFile ~/.ssh/{{ ikim_ssh_key }}
-            ForwardAgent yes
-
-          Host g1-? c? c?? shellhost
-            Hostname %h.ikim.uk-essen.de
-            User {{ ikim_username }}
-            IdentityFile ~/.ssh/{{ ikim_ssh_key }}
-            ProxyJump ikim
-            ForwardAgent yes
-          
-          Host github.com
-            IdentityFile ~/.ssh/{{ git_ssh_key }}
-
-    - name: Setup shell functions and aliases
-      copy:
-        dest: ~/.profile
-        content: |
-          alias ikim-proxy="ssh -fND 7001 ikim"
-
-    - name: Setup starship
-      lineinfile:
-        dest: ~/.bashrc
-        line: 'eval "$(starship init bash)"'
-
-    - name: Setup git
-      shell: |
-        git config --global user.name "{{ git_name }}"
-        git config --global user.email "{{ git_email }}"
-        git config --global gpg.format ssh
-        git config --global user.signingkey ~/.ssh/{{ git_ssh_key }}
-
-    - name: Register nushell
-      become: yes
-      lineinfile:
-        dest: /etc/shells
-        line: /usr/bin/nu
-
-    # - name: Setup nushell as default
-    #   become: yes
-    #   command: "chsh -s /usr/bin/nu {{ ansible_user_id }}"
+    - include_tasks: tasks/misc.yml
