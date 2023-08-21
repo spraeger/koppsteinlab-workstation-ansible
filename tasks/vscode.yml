@@ -41,6 +41,10 @@
 
 - name: Configure vscode
   shell: |
-    tmp=$(mktemp)
-    jq '."window.titleBarStyle" = "custom"' ~/.config/Code/User/settings.json > "$tmp"
-    mv "$tmp" ~/.config/Code/User/settings.json
+    function jqset() {
+      tmp=$(mktemp)
+      jq '$1' ~/.config/Code/User/settings.json > "$tmp"
+      mv "$tmp" ~/.config/Code/User/settings.json
+    }
+    jqset '."window.titleBarStyle" = "custom"'
+    jqset '."editor.fontFamily" = "Hack Nerd Font"'
