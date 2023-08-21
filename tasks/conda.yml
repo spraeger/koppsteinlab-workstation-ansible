@@ -1,0 +1,25 @@
+- name: Setup micromamba
+  tags:
+    - conda
+  block:
+    - name: Check micromamba install
+      stat:
+        path: ~/.local/bin/micromamba
+      register: micromamba_bin
+
+    - name: Install micromamba
+      shell: |
+        "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
+      when: not micromamba_bin.stat.exists
+
+    - name: Update micromamba
+      shell:
+        micromamba self-update
+      when: micromamba_bin.stat.exists
+
+    - name: Setup channels
+      shell: |
+        micromamba config append channels conda-forge
+        micromamba config append channels bioconda
+        micromamba config append channels nodefaults
+        micromamba config set channel_priority strict
