@@ -43,8 +43,8 @@
   shell: |
     function jqset() {
       tmp=$(mktemp)
-      jq '$1' ~/.config/Code/User/settings.json > "$tmp"
+      jq '."'$1'" = "'"$2"'"'  ~/.config/Code/User/settings.json > "$tmp"
       mv "$tmp" ~/.config/Code/User/settings.json
     }
-    jqset '."window.titleBarStyle" = "custom"'
-    jqset '."editor.fontFamily" = "Hack Nerd Font"'
+    jqset window.titleBarStyle custom
+    jqset editor.fontFamily 'Hack Nerd Font'
