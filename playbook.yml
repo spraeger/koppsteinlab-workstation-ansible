@@ -4,6 +4,13 @@
     - ~/.config/ansible/vars.yml
 
   tasks:
+    # https://github.com/FrameworkComputer/linux-docs/blob/main/Fedora38-13thGen.md
+    - name: Frame.work 13th gen workarounds
+      become: yes
+      shell: |
+        sudo grubby --update-kernel=ALL --args="module_blacklist=hid_sensor_hub"
+        sudo grubby --update-kernel=ALL --args="nvme.noacpi=1"
+
     # taken from https://github.com/gantsign/ansible-role-visual-studio-code
     - name: Install VS Code repo
       become: yes
@@ -60,6 +67,22 @@
           - google-noto-emoji-fonts
           - "@Development Tools"
 
+    # nerd fonts
+    - name: ensure fonts directory
+      file:
+        path: ~/.fonts
+        state: directory
+    - name: Check if nerd font exists
+      stat:
+        path: ~/.fonts/MonofurNerdFontMono-Regular.ttf
+      register: nerd_font
+    - name: Download nerd font
+      when: not nerd_font.stat.exists
+      unarchive:
+        src: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/Monofur.zip
+        dest: ~/.fonts/
+        remote_src: yes
+
     - name: Install vcsode extensions
       command: "code --install-extension {{ item }}"
       loop:
@@ -87,7 +110,7 @@
     - name: Configure vscode
       shell: |
         tmp=$(mktemp)
-        jq '."window.titlebarstyle" = "custom"' ~/.config/Code/User/settings.json > "$tmp"
+        jq '."window.titleBarStyle" = "custom"' ~/.config/Code/User/settings.json > "$tmp"
         mv "$tmp" ~/.config/Code/User/settings.json
 
     - name: Setup SSH
