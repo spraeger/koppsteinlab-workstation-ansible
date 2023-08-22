@@ -7,3 +7,5 @@
       - git
       - cmake
       - "@Development Tools"
+      - gsl-devel
+      - gsl
