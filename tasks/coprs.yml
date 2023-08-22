@@ -4,4 +4,3 @@
     name: "{{ item }}"
   loop:
     - atim/starship
-    - agoston/mattermost

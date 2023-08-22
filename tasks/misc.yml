@@ -4,6 +4,5 @@
     name:
       - util-linux-user
       - discord
-      - mattermost-desktop
       - starship
       - intel-media-driver
