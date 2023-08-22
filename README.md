@@ -36,12 +36,20 @@ git_email: johannes.koester@uni-due.de
 git_name: Johannes Koester
 ```
 
-### Step 3: Execute the ansible playbook to configure your workstation
+### Step 3: Clone the playbook repository
+
+```sh
+cd /tmp
+git clone https://github.com/koesterlab/koesterlab-workstation-ansible
+cd koesterlab-workstation-ansible
+```
+
+### Step 4: Execute the ansible playbook to configure your workstation
 
 Execute the configuration with
 
 ```bash
-curl https://github.com/koesterlab/koesterlab-workstation-ansible/raw/main/playbook.yml | ansible-playbook -K /dev/stdin
+ansible-playbook -K playbook.yml
 ```
 
 You will be asked for the `BECOME password`. This is simply your user password.
