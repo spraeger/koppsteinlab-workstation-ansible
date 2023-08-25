@@ -26,6 +26,7 @@
     - GitHub.copilot
     - GitHub.vscode-pull-request-github
     - GitHub.remotehub
+    - tamasfe.even-better-toml
 
 - name: Create vscode settings dir
   file:
