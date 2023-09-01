@@ -10,7 +10,7 @@
     state: directory
     mode: "u=rwx,go="
 
-- name: Create vscode settings file
+- name: Create discord settings file
   copy:
     dest: ~/.config/discord/settings.json
     force: false
