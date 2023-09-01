@@ -6,4 +6,5 @@
       - starship
       - intel-media-driver
       - dnf-automatic
+      - inkscape
       - texlive-scheme-full
